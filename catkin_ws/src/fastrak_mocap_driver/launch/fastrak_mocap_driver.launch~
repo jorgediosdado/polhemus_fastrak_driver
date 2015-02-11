@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="fastrak_mocap_driver" type="fastrak_allSensorRead" name="testfastrak_oneeee_sensor"
+    args="/dev/ttyS0 /polhemus_base_frame /polhemus_current_frame">
+  </node>
+</launch>
