@@ -7,7 +7,10 @@ project(fastrak_mocap_driver)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
+  cmake_modules
 )
+
+find_package(Eigen REQUIRED) 
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -18,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 catkin_package(
   CATKIN_DEPENDS roscpp tf
+	
 )
 
 ###########
@@ -27,6 +31,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN_INCLUDE_DIRS}	
 )
 
 add_executable(fastrak_allSensorRead 

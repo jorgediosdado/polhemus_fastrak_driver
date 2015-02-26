@@ -1,6 +1,9 @@
 /*
 Author: Eohan George, Pushkar Kolhe 
 Nov 17, 2010
+
+Revised by: Jorge Diosdado
+February 2015
 */
 
 #ifndef FASTRAK_SERIALPORT_H
@@ -12,6 +15,7 @@ Nov 17, 2010
 #include <string>
 #include <tf/transform_broadcaster.h>
 #include <boost/circular_buffer.hpp>
+#include <Eigen/Dense>
 
 // the max number of receivers
 #define MAX_NUM_RECEIVERS 4
@@ -36,6 +40,7 @@ namespace polyhemus
 		// this is a delimiting character for checking;
 		char end_char;
 	};
+
 #pragma pack()
 
 	class Fastrak
@@ -47,6 +52,8 @@ namespace polyhemus
 		std::string deviceName;
 		// pragma pack required so as to enable the data structure to be packed by each byte
 		int a;
+
+		Eigen::Quaterniond quat;
 		boost::circular_buffer <char> cb;// CIRC_BUFFER_SIZE);
 		// the number of characters missing from earlier data
 		int leftOver;
@@ -65,6 +72,9 @@ namespace polyhemus
 			deviceName =_deviceName;// ="/dev/ttyS0";
 			cb.set_capacity(CIRC_BUFFER_SIZE);
 		}
+
+		Eigen::Vector3d quaternionToEulerAnglesZYX(Eigen::Quaterniond q);
+
 		const std::vector <StationData>& getTransform()
 		{
 			return sensTransform;

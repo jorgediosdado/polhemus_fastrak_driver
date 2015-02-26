@@ -20,7 +20,10 @@ int main(int argc, char**argv)
 	Fastrak ftrk(argv[1]);
 	tf::TransformBroadcaster tfBr;  //TransformBroadcaster object 
 					// hardcoding the sensor reading rate -- check
-	ros::Rate r(60);
+	
+
+	ros::NodeHandle n;
+	ros::Rate r(50);
 	std::ostringstream os;
 	const vector<StationData> &sensTransform = ftrk.getTransform();
 	if(ftrk.init()==false)
@@ -41,15 +44,17 @@ int main(int argc, char**argv)
 	}
 	string p ("Base: "+base+" Sensor: "+sensor);
 	ROS_INFO(p.c_str());
+
+	
+	
 	while(ros::ok())
 	{
-		
 		// read and publish tf
 		// actually reads from the serial port
 		ftrk.getSensPosition();
 		int numTransforms = sensTransform.size();
 		//cout <<"size :: " <<sensTransform.size() << endl;
-		ROS_INFO("Number of Transforms %u", sensTransform.size());//numTransforms);
+		ROS_DEBUG("Number of Transforms %u", sensTransform.size());//numTransforms);
 		for(uint i = 0; i<sensTransform.size();i++)
 		{
 			
@@ -58,6 +63,8 @@ int main(int argc, char**argv)
 			os << sensor <<sensTransform[i].first;
 			// publishes the data that has been read already into the topic
 			tfBr.sendTransform(tf::StampedTransform(sensTransform[i].second, ros::Time::now(), base, 				os.str()));
+
+						
 			ROS_WARN("%d Base:%s Sensor:%s", sensTransform[i].first,base.c_str(),os.str().c_str() );
 		}
 		int cleared = ftrk.clearSensorTransforms();

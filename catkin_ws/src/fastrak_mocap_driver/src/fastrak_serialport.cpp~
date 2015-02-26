@@ -10,8 +10,7 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 {
 	//f(x) = p1*x + p2
 	ROS_DEBUG("Sensor Values UnCalibrated: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",_dat.station_num-48, 		_dat.x,_dat.y,_dat.z,_dat.xq,_dat.yq,_dat.zq,_dat.wq);
-	//float p1 = 1.459, p2 = 0.04989*factor;	//Some calibration
-
+	
 	float p1 = 1, p2 = 0*factor; 			//No calibration
 	dat = _dat;
 	dat.x = (_dat.x*p1 + p2)/factor;
@@ -46,36 +45,15 @@ bool Fastrak::init()
 					
 
 	
-	char *metric= "U\n";			
-	char *binary= "f\n"; 			
+			
     	char *continuous= "C\n";
-	std::string format("Ox,52,61,50\n");
-	//std::string hemisphere("H1,0,0,1\n");  	//Hemisphere command does not work. It can be set through 								terminal.
-	
-	/*char comando[]="H";
-	char estacion[]="1";
-	char coma1[]=",";
-	char hx[]="0";
-	char coma2[]=",";
-	char hy[]="0";
-	char coma3[]=",";
-	char hz[]="0";
-	char retorno[]="\n";	
-	write(tty_fd,comando,strlen(comando) );
-	write(tty_fd,estacion,strlen(estacion) );
-	write(tty_fd,coma1,strlen(coma1) );
-	write(tty_fd,hx,strlen(hx) );
-	write(tty_fd,coma2,strlen(coma2) );
-	write(tty_fd,hy,strlen(hy) );
-	write(tty_fd,coma3,strlen(coma3) );
-	write(tty_fd,hz,strlen(hz) );
-	write(tty_fd,retorno,strlen(retorno) );*/
-	
+	//std::string format("Ox,52,61,50\n");		//This is set to be the default configuration for the 								station 1. If there is a need to change it, there is a 								need to change the data structure, as well as the method 								to capture data
+	//char *metric= "u\n";			
+	//char *binary= "f\n"; 	
 
    	if(
-	//write(tty_fd,hemisphere.c_str(),hemisphere.length() ) <=0 ||
-	write(tty_fd,metric,strlen(metric) ) <=0 ||
-   	write(tty_fd,binary, strlen(binary)) <=0 ||
+	//write(tty_fd,metric,strlen(metric) ) <=0 ||
+   	//write(tty_fd,binary, strlen(binary)) <=0 ||
 	write(tty_fd,continuous, strlen(continuous)) <=0) 
    	
    	 {
@@ -83,17 +61,16 @@ bool Fastrak::init()
     	    return false;
   	  }
 
-	
-   	//write the ascii value of the sensor
-   	for(int i = 0 ; i < MAX_NUM_RECEIVERS; i++)
-   	{
-   	     format[1] = (char)('1' + i);
-   	     if (write(tty_fd, format.c_str(), format.length() ) <= 0)
-   	     {
-     	       ROS_ERROR("could not write to serial port ");
-     	       return false;
-     	     }
-	}
+	//write the ascii value of the sensor
+   	//for(int i = 0 ; i < MAX_NUM_RECEIVERS; i++)
+   	//{
+   	//     format[1] = (char)('1' + i);
+   	//     if (write(tty_fd, format.c_str(), format.length() ) <= 0)
+   	//     {
+     	//       ROS_ERROR("could not write to serial port ");
+     	//       return false;
+     	//     }
+	//}
 
      
 
@@ -131,17 +108,26 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	ROS_DEBUG("populating TF station: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",dat.station_num-48, 		dat.x,dat.y,dat.z,dat.xq,dat.yq,dat.zq,dat.wq);
 	StationData stData;			
 	stData.first = dat.station_num-48; 	// obtain the ASCII value 
-
-
-
+	Eigen::Quaterniond quat;
+	Eigen::Vector3d euler;
 //Broadcast transform
 
 	tf::Transform tf; //tf is a transform object
 	//tf.setOrigin( tf::Vector3(dat.x/factor,dat.y/factor,dat.z/factor) ); removing the factorization to 											calibration
 	tf.setOrigin( tf::Vector3(dat.x,dat.y,dat.z) ); //setOrigin Returns the origin vector translation
 
+
 	//Return a quaternion representing the rotation.
-	tf.setRotation(tf::Quaternion(dat.xq,dat.yq,dat.zq,dat.wq) ); 
+	tf.setRotation(tf::Quaternion(dat.xq,dat.yq,dat.zq,dat.wq) );
+
+	
+	quat.w()=dat.wq;
+	quat.x()=dat.xq;
+	quat.y()=dat.yq;
+	quat.z()=dat.zq;		
+	euler = Fastrak::quaternionToEulerAnglesZYX(quat);
+	ROS_ERROR("%f,%f,%f", euler[0]*180/3.1416, euler[1]*180/3.1416, euler[2]*180/3.1416);
+
 
 	stData.second = tf; //tf se almacena en stData
 	vecTransform.push_back(stData);
@@ -226,8 +212,24 @@ void Fastrak::getSensPosition ()
 
 }
 
+
+
+Eigen::Vector3d Fastrak::quaternionToEulerAnglesZYX(Eigen::Quaterniond q)
+ {
+   // Implementation from RPG quad_tutorial
+   Eigen::Vector3d euler_angles;
+   euler_angles(0) = atan2(2*q.w()*q.x() + 2*q.y()*q.z(), q.w()*q.w() - q.x()*q.x() - q.y()*q.y() + q.z()*q.z());
+   euler_angles(1) = -asin(2*q.x()*q.z() - 2*q.w()*q.y());
+   euler_angles(2) = atan2(2*q.w()*q.z() + 2*q.x()*q.y(), q.w()*q.w() + q.x()*q.x() - q.y()*q.y() - q.z()*q.z());
+   return euler_angles;
+ }
+
+
 void Fastrak::getSensPosition (std::vector <StationData>& transforms)
 {
 	getSensPosition();
 	transforms = sensTransform;
 }
+
+
+

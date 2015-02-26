@@ -12,11 +12,12 @@ Nov 17, 2010
 #include <string>
 #include <tf/transform_broadcaster.h>
 #include <boost/circular_buffer.hpp>
+#include <Eigen/Dense>
 
 // the max number of receivers
 #define MAX_NUM_RECEIVERS 4
 // the max characters to pass to check for correct data consistency
-#define MAX_TRIES_CORRECT_CBUFFER 2
+#define MAX_TRIES_CORRECT_CBUFFER 3
 // max size of circ buffer - I think this is the max the serial can output too
 #define CIRC_BUFFER_SIZE 500
 namespace polyhemus
@@ -36,6 +37,7 @@ namespace polyhemus
 		// this is a delimiting character for checking;
 		char end_char;
 	};
+
 #pragma pack()
 
 	class Fastrak
@@ -47,6 +49,8 @@ namespace polyhemus
 		std::string deviceName;
 		// pragma pack required so as to enable the data structure to be packed by each byte
 		int a;
+
+		Eigen::Quaterniond quat;
 		boost::circular_buffer <char> cb;// CIRC_BUFFER_SIZE);
 		// the number of characters missing from earlier data
 		int leftOver;
@@ -65,6 +69,9 @@ namespace polyhemus
 			deviceName =_deviceName;// ="/dev/ttyS0";
 			cb.set_capacity(CIRC_BUFFER_SIZE);
 		}
+
+		Eigen::Vector3d quaternionToEulerAnglesZYX(Eigen::Quaterniond q);
+
 		const std::vector <StationData>& getTransform()
 		{
 			return sensTransform;
