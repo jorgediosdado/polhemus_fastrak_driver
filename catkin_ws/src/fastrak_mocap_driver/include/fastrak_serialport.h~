@@ -1,6 +1,9 @@
 /*
 Author: Eohan George, Pushkar Kolhe 
 Nov 17, 2010
+
+Revised by: Jorge Diosdado
+February 2015
 */
 
 #ifndef FASTRAK_SERIALPORT_H

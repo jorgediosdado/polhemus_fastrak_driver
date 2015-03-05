@@ -11,18 +11,30 @@ using namespace polyhemus;
 int main(int argc, char**argv)
 {
 	ros::init(argc,argv,"testfastrak_one_sensor");
-	if(argc < 2)
+	/*if(argc < 2)
 	{
-		ROS_ERROR("Need device name as argument");
+		ROS_ERROR("Need device name as aaaaaargument");
 		ROS_INFO("fastrak <serial_device_file> <tf_root_name_with_starting_slash> <tf_sensor_names_with_starting_slash>");
 		return -1;
-	}
-	Fastrak ftrk(argv[1]);
+	}*/
+
+	ros::NodeHandle n;
+	string serialport;
+
+	//const char* constante=serialport.c_str();   //casting for fastrak function
+	//n.getParam("serial", serialport);	    //It can be better to use param
+
+	string defserial="/dev/ttyS0";		    //This is the default value for the serial port
+	n.param("serial", serialport,defserial);
+	Fastrak ftrk(serialport.c_str());  		   	
+
+	
+
 	tf::TransformBroadcaster tfBr;  //TransformBroadcaster object 
 					// hardcoding the sensor reading rate -- check
 	
 
-	ros::NodeHandle n;
+	
 	ros::Rate r(50);
 	std::ostringstream os;
 	const vector<StationData> &sensTransform = ftrk.getTransform();
@@ -31,19 +43,27 @@ int main(int argc, char**argv)
 		return -1;
 	}
 
-	string base("/fastrak_transmitter");
-	string sensor("/sensor_");
-	if(argc >= 4)
-	{
-		sensor = (char *)argv[3];
-		base = argv[2];
-	}
-	else if (argc >= 3)
-	{
-		base = argv[2];
-	}
-	string p ("Base: "+base+" Sensor: "+sensor);
-	ROS_INFO(p.c_str());
+	string base;
+	string sensor;
+
+	string def1="/fastrak_transmitter";
+	string def2="/polhemus_current_frame";
+	n.param("base_frame",base,def1);
+	n.param("current_sensor",sensor,def2);
+
+
+
+	//if(argc >= 4)
+	//{
+	//	sensor = (char *)argv[3];
+	//	base = argv[2];
+	//}
+	//else if (argc >= 3)
+	//{
+	//	base = argv[2];
+	//}
+	//string p ("Base: "+base+" Sensor: "+sensor);
+	//ROS_INFO(p.c_str());
 
 	
 	

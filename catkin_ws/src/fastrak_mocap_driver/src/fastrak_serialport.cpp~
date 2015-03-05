@@ -29,8 +29,10 @@ bool Fastrak::init()
 	tio.c_lflag=0;
 	tio.c_cc[VMIN]=47;
 	tio.c_cc[VTIME]=5;
-
-	tty_fd=open(deviceName.c_str(), O_RDWR | O_NONBLOCK);
+	
+	//ROS_ERROR("PUERTO %s", deviceName);
+	
+	tty_fd=open(deviceName, O_RDWR | O_NONBLOCK);
 	if(tty_fd == -1 ) 
 	{
 		std::string er ("Device:"+deviceName +" could be opened");
@@ -108,9 +110,9 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	ROS_DEBUG("populating TF station: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",dat.station_num-48, 		dat.x,dat.y,dat.z,dat.xq,dat.yq,dat.zq,dat.wq);
 	StationData stData;			
 	stData.first = dat.station_num-48; 	// obtain the ASCII value 
-	Eigen::Quaterniond quat;
+	
 	Eigen::Vector3d euler;
-//Broadcast transform
+	//Broadcast transform
 
 	tf::Transform tf; //tf is a transform object
 	//tf.setOrigin( tf::Vector3(dat.x/factor,dat.y/factor,dat.z/factor) ); removing the factorization to 											calibration
@@ -120,7 +122,7 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	//Return a quaternion representing the rotation.
 	tf.setRotation(tf::Quaternion(dat.xq,dat.yq,dat.zq,dat.wq) );
 
-	
+	//This section is only for debugging purposes
 	quat.w()=dat.wq;
 	quat.x()=dat.xq;
 	quat.y()=dat.yq;

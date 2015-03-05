@@ -29,7 +29,9 @@ bool Fastrak::init()
 	tio.c_lflag=0;
 	tio.c_cc[VMIN]=47;
 	tio.c_cc[VTIME]=5;
-
+	
+	//ROS_ERROR("PUERTO %s", deviceName);
+	
 	tty_fd=open(deviceName.c_str(), O_RDWR | O_NONBLOCK);
 	if(tty_fd == -1 ) 
 	{
@@ -110,7 +112,7 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	stData.first = dat.station_num-48; 	// obtain the ASCII value 
 	
 	Eigen::Vector3d euler;
-//Broadcast transform
+	//Broadcast transform
 
 	tf::Transform tf; //tf is a transform object
 	//tf.setOrigin( tf::Vector3(dat.x/factor,dat.y/factor,dat.z/factor) ); removing the factorization to 											calibration
@@ -120,7 +122,7 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	//Return a quaternion representing the rotation.
 	tf.setRotation(tf::Quaternion(dat.xq,dat.yq,dat.zq,dat.wq) );
 
-	
+	//This section is only for debugging purposes
 	quat.w()=dat.wq;
 	quat.x()=dat.xq;
 	quat.y()=dat.yq;

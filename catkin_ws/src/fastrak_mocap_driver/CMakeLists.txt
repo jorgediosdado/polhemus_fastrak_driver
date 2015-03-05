@@ -37,6 +37,7 @@ include_directories(
 add_executable(fastrak_allSensorRead 
   src/allSensorRead.cpp 
   src/fastrak_serialport.cpp
+  
   )
 
 target_link_libraries(fastrak_allSensorRead

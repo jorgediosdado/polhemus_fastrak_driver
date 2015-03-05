@@ -54,7 +54,7 @@ namespace polyhemus
 		int a;
 
 		Eigen::Quaterniond quat;
-		boost::circular_buffer <char> cb;// CIRC_BUFFER_SIZE);
+		boost::circular_buffer <char> cb;
 		// the number of characters missing from earlier data
 		int leftOver;
 		/* returns the number of steps skipped to obtain a valid Data segment
