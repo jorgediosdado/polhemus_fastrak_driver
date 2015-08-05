@@ -1,0 +1,28 @@
+Convert Xmeasured to XOrig
+==========================
+Linear model Poly1:
+     f(x) = p1*x + p2
+Coefficients (with 95% confidence bounds):
+       p1 =       1.459  (1.425, 1.493)
+       p2 =     0.04989  (0.04186, 0.05793)
+
+Goodness of fit:
+  SSE: 4.917e-05
+  R-square: 0.9997
+  Adjusted R-square: 0.9996
+  RMSE: 0.003506
+
+Convert Ymeasured to YOrig
+==========================
+
+Linear model Poly1:
+     f(x) = p1*x + p2
+Coefficients (with 95% confidence bounds):
+       p1 =       1.456  (1.426, 1.486)
+       p2 =     0.04354  (0.03629, 0.0508)
+
+Goodness of fit:
+  SSE: 3.879e-05
+  R-square: 0.9998
+  Adjusted R-square: 0.9997
+  RMSE: 0.003114
