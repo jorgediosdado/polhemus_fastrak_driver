@@ -21,7 +21,7 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 bool Fastrak::init()
 {
 	
-	setDistanceDivisionFactor(1);	// Convert the units. cm-->factor=1, m--> factor=100
+	setDistanceDivisionFactor(100);	// Convert the units. cm-->factor=1, m--> factor=100
 	memset(&tio,0,sizeof(tio));
 	tio.c_iflag=0;
 	tio.c_oflag=0;
@@ -128,7 +128,7 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	quat.y()=dat.yq;
 	quat.z()=dat.zq;		
 	euler = Fastrak::quaternionToEulerAnglesZYX(quat);
-	ROS_ERROR("%f,%f,%f", euler[0]*180/3.1416, euler[1]*180/3.1416, euler[2]*180/3.1416);
+	//ROS_ERROR("%f,%f,%f", euler[0]*180/3.1416, euler[1]*180/3.1416, euler[2]*180/3.1416);
 
 
 	stData.second = tf; //tf se almacena en stData

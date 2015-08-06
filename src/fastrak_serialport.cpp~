@@ -32,7 +32,7 @@ bool Fastrak::init()
 	
 	//ROS_ERROR("PUERTO %s", deviceName);
 	
-	tty_fd=open(deviceName, O_RDWR | O_NONBLOCK);
+	tty_fd=open(deviceName.c_str(), O_RDWR | O_NONBLOCK);
 	if(tty_fd == -1 ) 
 	{
 		std::string er ("Device:"+deviceName +" could be opened");
@@ -128,7 +128,7 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	quat.y()=dat.yq;
 	quat.z()=dat.zq;		
 	euler = Fastrak::quaternionToEulerAnglesZYX(quat);
-	ROS_ERROR("%f,%f,%f", euler[0]*180/3.1416, euler[1]*180/3.1416, euler[2]*180/3.1416);
+	//ROS_ERROR("%f,%f,%f", euler[0]*180/3.1416, euler[1]*180/3.1416, euler[2]*180/3.1416);
 
 
 	stData.second = tf; //tf se almacena en stData

@@ -48,8 +48,8 @@ int main(int argc, char**argv)
 
 	string def1="/fastrak_transmitter";
 	string def2="/polhemus_current_frame";
-	n.param("/polhemus_base_frame",base,def1);
-	n.param("/polhemus_current_sensor",sensor,def2);
+	n.param("base_frame",base,def1);
+	n.param("current_sensor",sensor,def2);
 
 
 

@@ -11,25 +11,15 @@ using namespace polyhemus;
 int main(int argc, char**argv)
 {
 	ros::init(argc,argv,"testfastrak_one_sensor");
-	/*if(argc < 2)
-	{
-		ROS_ERROR("Need device name as aaaaaargument");
-		ROS_INFO("fastrak <serial_device_file> <tf_root_name_with_starting_slash> <tf_sensor_names_with_starting_slash>");
-		return -1;
-	}*/
+	
 
 	ros::NodeHandle n;
 	string serialport;
-
-	//const char* constante=serialport.c_str();   //casting for fastrak function
-	//n.getParam("serial", serialport);	    //It can be better to use param
-
 	string defserial="/dev/ttyS0";		    //This is the default value for the serial port
 	n.param("serial", serialport,defserial);
 	Fastrak ftrk(serialport.c_str());  		   	
 
 	
-
 	tf::TransformBroadcaster tfBr;  //TransformBroadcaster object 
 					// hardcoding the sensor reading rate -- check
 	
