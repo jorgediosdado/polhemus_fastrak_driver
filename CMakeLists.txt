@@ -7,7 +7,9 @@ project(fastrak_mocap_driver)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
+  tf2
   cmake_modules
+  calibration
 )
 
 find_package(Eigen REQUIRED) 
@@ -20,7 +22,7 @@ find_package(Eigen REQUIRED)
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp tf
+  CATKIN_DEPENDS roscpp tf calibration tf2 cmake_modules
 	
 )
 

@@ -8,23 +8,28 @@
 using namespace std;
 using namespace polyhemus;
 
+calibration::pointError pointError[100];
+
+void st()
+{
+   
+}
+
 int main(int argc, char**argv)
 {
 	ros::init(argc,argv,"testfastrak_one_sensor");
-	
-
 	ros::NodeHandle n;
-	string serialport;
-	string defserial="/dev/ttyS0";		    //This is the default value for the serial port
-	n.param("serial", serialport,defserial);
-	Fastrak ftrk(serialport.c_str());  		   	
+	ros::Subscriber subs1;
+        int i;
 
+	string serialport;
+	string defserial="/dev/ttyUSB0";		    //This is the default value for the serial port
+	n.param("serial", serialport,defserial);
+	Fastrak ftrk(serialport.c_str(), n);  		   	
+	
 	
 	tf::TransformBroadcaster tfBr;  //TransformBroadcaster object 
 					// hardcoding the sensor reading rate -- check
-	
-
-	
 	ros::Rate r(50);
 	std::ostringstream os;
 	const vector<StationData> &sensTransform = ftrk.getTransform();
@@ -40,22 +45,13 @@ int main(int argc, char**argv)
 	string def2="/polhemus_current_frame";
 	n.param("base_frame",base,def1);
 	n.param("current_sensor",sensor,def2);
-
-
-
-	//if(argc >= 4)
-	//{
-	//	sensor = (char *)argv[3];
-	//	base = argv[2];
-	//}
-	//else if (argc >= 3)
-	//{
-	//	base = argv[2];
-	//}
-	//string p ("Base: "+base+" Sensor: "+sensor);
-	//ROS_INFO(p.c_str());
-
 	
+	subs1=n.subscribe("/calibrationpoints", 100, st);
+	
+	//for(i=0;i<101;i++)
+	//{
+        //  ftrk.pointError[i]=pointError[i];
+        //}
 	
 	while(ros::ok())
 	{

@@ -2,12 +2,34 @@
 #include "fastrak_serialport.h"
 using namespace polyhemus;
 
+
+Fastrak::Fastrak(const char *_deviceName, ros::NodeHandle& n)
+{
+	leftOver = 0;
+	deviceName =_deviceName;// ="/dev/ttyS0";
+	cb.set_capacity(CIRC_BUFFER_SIZE);
+	
+}
+
+Fastrak::~Fastrak() {}
+
+void Fastrak::calibration()
+{
+	
+	
+}
+
+
 void Fastrak::setDistanceDivisionFactor(float factor_)
 {
 	factor=factor_;
 }
+
+
 void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 {
+
+	
 	//f(x) = p1*x + p2
 	ROS_DEBUG("Sensor Values UnCalibrated: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",_dat.station_num-48, 		_dat.x,_dat.y,_dat.z,_dat.xq,_dat.yq,_dat.zq,_dat.wq);
 	
