@@ -1,6 +1,6 @@
 <launch>
   <node pkg="fastrak_mocap_driver" type="fastrak_allSensorRead" name="testfastrak_one_sensor">
-  	<param name="serial"  value="/dev/ttyS0"/>
+  	<param name="serial"  value="/dev/ttyUSB0"/>
 	<param name="base_frame"  value="/polhemus_base_frame"/>
 	<param name="current_frame"  value="/polhemus_current_frame"/>
   </node>
@@ -11,7 +11,7 @@
 	<param name="~calib_count" value="10"/>
 	<param name="~stat_history" value="100"/>
 	<node pkg="leica_ts12" name="leica_ts12_driver" type="leica_ts12_driver.py" output="screen"> 		
-		<param name="~port" value="/dev/ttyUSB0"/>
+		<param name="~port" value="/dev/ttyUSB1"/>
 		<param name="~baud" value="115200"/>
 	</node>
 

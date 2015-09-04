@@ -1,5 +1,7 @@
 
 #include "fastrak_serialport.h"
+
+
 using namespace polyhemus;
 
 
@@ -8,16 +10,11 @@ Fastrak::Fastrak(const char *_deviceName, ros::NodeHandle& n)
 	leftOver = 0;
 	deviceName =_deviceName;// ="/dev/ttyS0";
 	cb.set_capacity(CIRC_BUFFER_SIZE);
-	
+	nocalpublisher = n.advertise<geometry_msgs::PointStamped>("nocalibrated", 1000);
 }
 
 Fastrak::~Fastrak() {}
 
-void Fastrak::calibration()
-{
-	
-	
-}
 
 
 void Fastrak::setDistanceDivisionFactor(float factor_)
@@ -25,23 +22,118 @@ void Fastrak::setDistanceDivisionFactor(float factor_)
 	factor=factor_;
 }
 
-void Fastrak::storingFunction(calibration::pointError& msg)
-{
-   subs1=n.subscribe("/calibrationpoints", 100, &Fastrak::storingFunction, this);
-}
 
 void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 {
 
+	float r[100];
+        float w[100];
+        float d;
+	int i;
+	float dmax=0.6;
+        float total=0;
+
+	float xcorrection=0;
+        float ycorrection=0;
+        float zcorrection=0;
+	int nocal=0;
+	geometry_msgs::PointStamped pointnocal;
 	
-	//f(x) = p1*x + p2
-	ROS_DEBUG("Sensor Values UnCalibrated: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",_dat.station_num-48, 		_dat.x,_dat.y,_dat.z,_dat.xq,_dat.yq,_dat.zq,_dat.wq);
+	_dat.y=-_dat.y;
+	_dat.z=-_dat.z; 
+
+	//Manually remove the offsets. I am translating the reference frame to that of the Leica. This should be 		done automatically in the future
+	//Multiply*100to compensate the factor. offset negative in xa nad positive in z. Dont understand why yet. 
+        
+	float offsetx=2.95158810914; //multiply offset by 100
+        float offsety=0.6843064446;
+        float offsetz=-7.69678354263;
+
+	//Uncalibrated values
+	pointnocal.point.x=_dat.x/100-offsetx/100;
+	pointnocal.point.y=_dat.y/100+offsety/100;
+	pointnocal.point.z=_dat.z/100+offsetz/100;
+	pointnocal.header.stamp=ros::Time::now();
 	
-	float p1 = 1, p2 = 0*factor; 			//No calibration
+
+        //ROS_ERROR("%d",calibrationcomplete);
+   if(calibrationcomplete==1)
+   {
+	float p1 = 1;
+	for(i=0;i<100;i++)
+        {
+	  d=sqrt(pow(dat.x-pointError[i].point.x,2)+pow(dat.y-pointError[i].point.y,2)+pow(dat.z-pointError[i].point.z,2));
+	  
+         //ROS_ERROR("distance=%f",d);
+	  
+	if(d<dmax){
+          r[i]=exp(-d);
+	  }
+	 else{
+	   r[i]=0;
+        }
+        //ROS_ERROR("r=%f",r[i]);
+        //ROS_ERROR("pointError[%d].point.x=%f",i,pointError[i].point.x);
+        //ROS_ERROR("r[%d] %f",i,r[i]);
+	}
+        
+	for(i=0;i<100;i++)
+        {
+          total+=r[i];
+        }
+        for(i=0;i<100;i++)
+        {
+          w[i]=r[i]/total;
+	  //ROS_ERROR("W[%d]=%f",i,w[i]);
+        }
+  
+	for(i=0;i<100;i++)
+        {
+          xcorrection+=w[i]*pointError[i].error.x;
+          ycorrection+=w[i]*pointError[i].error.y;
+          zcorrection+=w[i]*pointError[i].error.z;
+        }
+        //ROS_ERROR("UnCalibrated x:%f y:%f z:%f ",(_dat.x - offsetx)/100,(_dat.y+offsety)/100,(_dat.z+offsetz)/100);
+	        
+        if(d<0.001||d>5||total<=0.00001)
+	{ 
+	  dat = _dat;
+	  dat.x = (_dat.x - offsetx)/factor;
+	  dat.y = (_dat.y + offsety)/factor;
+	  dat.z = (_dat.z + offsetz)/factor;
+	  ROS_ERROR("NANS!");	  
+	  nocal=1;
+	  //ROS_ERROR("NOCAL=%d",nocal);
+	}
+	 
+	  
+        if(nocal==0){
+	  
+	
 	dat = _dat;
-	dat.x = (_dat.x*p1 + p2)/factor;
-	dat.y = (_dat.y*p1 + p2)/factor;
-	dat.z = (_dat.z*p1 + p2)/factor;
+	dat.x = (_dat.x - offsetx)/factor;
+	dat.y = (_dat.y + offsety)/factor;
+	dat.z = (_dat.z + offsetz)/factor;
+	ROS_ERROR("COORECTIONX= %f, corerctiony= %f, correctionz= %f", xcorrection, ycorrection, zcorrection);
+
+	//ROS_ERROR("Calibrated x:%f y:%f z:%f ",dat.x,dat.y,dat.z);
+        
+	}
+            
+   }     
+  if(calibrationcomplete==0)
+   {
+    	//No calibration
+	dat = _dat;
+	dat.x = (_dat.x - offsetx)/factor;
+	dat.y = (_dat.y + offsety)/factor;
+	dat.z = (_dat.z + offsetz)/factor;
+	
+        //ROS_ERROR("NOCALIBRATION");
+   }
+
+  nocalpublisher.publish(pointnocal);
+
 }
 
 bool Fastrak::init()
@@ -70,9 +162,7 @@ bool Fastrak::init()
 	cfsetispeed(&tio,B115200); // Baud rate = 115200 
 
 	tcsetattr(tty_fd,TCSANOW,&tio);
-					
-
-	
+						
 			
     	char *continuous= "C\n";
 	//std::string format("Ox,52,61,50\n");		//This is set to be the default configuration for the 								station 1. If there is a need to change it, there is a 								need to change the data structure, as well as the method 								to capture data
@@ -133,7 +223,7 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 {
 	Data dat;				
 	calibrateSensorValue(_dat,dat);
-	ROS_DEBUG("populating TF station: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",dat.station_num-48, 		dat.x,dat.y,dat.z,dat.xq,dat.yq,dat.zq,dat.wq);
+	//ROS_ERROR("populating TF station: %d x:%f y:%f z:%f    xq:%f yq:%f zq:%f wq:%f",dat.station_num-48, 		dat.x,dat.y,dat.z,dat.xq,dat.yq,dat.zq,dat.wq);
 	StationData stData;			
 	stData.first = dat.station_num-48; 	// obtain the ASCII value 
 	
@@ -149,11 +239,11 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	tf.setRotation(tf::Quaternion(dat.xq,dat.yq,dat.zq,dat.wq) );
 
 	//This section is only for debugging purposes
-	quat.w()=dat.wq;
-	quat.x()=dat.xq;
-	quat.y()=dat.yq;
-	quat.z()=dat.zq;		
-	euler = Fastrak::quaternionToEulerAnglesZYX(quat);
+	//quat.w()=dat.wq;
+	//quat.x()=dat.xq;
+	//quat.y()=dat.yq;
+	//quat.z()=dat.zq;		
+	//euler = Fastrak::quaternionToEulerAnglesZYX(quat);
 	//ROS_ERROR("%f,%f,%f", euler[0]*180/3.1416, euler[1]*180/3.1416, euler[2]*180/3.1416);
 
 

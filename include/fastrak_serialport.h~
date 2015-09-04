@@ -17,7 +17,7 @@ February 2015
 #include <boost/circular_buffer.hpp>
 #include <Eigen/Dense>
 #include "calibration/pointError.h"
-
+#include <math.h>  
 
 // the max number of receivers
 #define MAX_NUM_RECEIVERS 4
@@ -50,10 +50,10 @@ namespace polyhemus
 	public:
 		Fastrak(const char *_deviceName, ros::NodeHandle& n);
 		~Fastrak();
-		ros::NodeHandle calibrationnode;
-		
+		ros::Subscriber subs1;
+		ros::Publisher nocalpublisher;
+		int calibrationcomplete=0;
 
-		int calibrationcomplete;
 		std::vector <StationData> sensTransform;
 		// the serial port structure from termios
 		struct termios tio;
@@ -62,7 +62,7 @@ namespace polyhemus
 		// pragma pack required so as to enable the data structure to be packed by each byte
 		int a;
 		
-		//calibration::pointError pointError[100];
+		calibration::pointError pointError[100];
 		Eigen::Quaterniond quat;
 		boost::circular_buffer <char> cb;
 		// the number of characters missing from earlier data
@@ -75,10 +75,6 @@ namespace polyhemus
 		void populateTf(Data &dat, std::vector<StationData> & vecTransform);
 		void setDistanceDivisionFactor(float factor_);
 		void calibrateSensorValue(Data &_dat, Data &dat);
-
-
-		void storingFunction(calibration::pointError& msg);
-		void calibration();
 
 		Eigen::Vector3d quaternionToEulerAnglesZYX(Eigen::Quaterniond q);
 
@@ -99,8 +95,7 @@ namespace polyhemus
 			sensTransform.clear();
 			return size;
 		}
-        private:
-                ros::Subscriber subs1;
+                        
 	};
 }
 #endif

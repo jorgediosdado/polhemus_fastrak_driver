@@ -17,7 +17,8 @@ February 2015
 #include <boost/circular_buffer.hpp>
 #include <Eigen/Dense>
 #include "calibration/pointError.h"
-
+#include <math.h>  
+#include "geometry_msgs/PointStamped.h"
 
 // the max number of receivers
 #define MAX_NUM_RECEIVERS 4
@@ -50,10 +51,10 @@ namespace polyhemus
 	public:
 		Fastrak(const char *_deviceName, ros::NodeHandle& n);
 		~Fastrak();
-		ros::NodeHandle calibrationnode;
-		
+		ros::Subscriber subs1;
+		ros::Publisher nocalpublisher;
+		int calibrationcomplete=0;
 
-		int calibrationcomplete;
 		std::vector <StationData> sensTransform;
 		// the serial port structure from termios
 		struct termios tio;
@@ -75,8 +76,6 @@ namespace polyhemus
 		void populateTf(Data &dat, std::vector<StationData> & vecTransform);
 		void setDistanceDivisionFactor(float factor_);
 		void calibrateSensorValue(Data &_dat, Data &dat);
-
-		void calibration();
 
 		Eigen::Vector3d quaternionToEulerAnglesZYX(Eigen::Quaterniond q);
 

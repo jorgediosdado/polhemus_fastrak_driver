@@ -1,18 +1,22 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(fastrak_mocap_driver)
+project(polhemus_fastrak_driver)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   tf
   tf2
-  cmake_modules
-  calibration
+  cmake_modules  
+  leica_ts12
+  std_msgs
+  geometry_msgs
 )
 
 find_package(Eigen REQUIRED) 
+
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -22,7 +26,7 @@ find_package(Eigen REQUIRED)
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  CATKIN_DEPENDS roscpp tf calibration tf2 cmake_modules
+  CATKIN_DEPENDS roscpp tf std_msgs calibration leica_ts12 tf2 cmake_modules message_runtime
 	
 )
 
@@ -38,13 +42,15 @@ include_directories(
 
 add_executable(fastrak_allSensorRead 
   src/allSensorRead.cpp 
-  src/fastrak_serialport.cpp
+  src/fastrak.cpp
+
   
   )
 
 target_link_libraries(fastrak_allSensorRead
   ${catkin_LIBRARIES}
   )
+
 
 #############
 ## Install ##
