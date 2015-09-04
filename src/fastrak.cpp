@@ -26,11 +26,11 @@ void Fastrak::setDistanceDivisionFactor(float factor_)
 void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 {
 
-	float r[100];
-        float w[100];
-        float d;
+	float r[14];
+        float w[14];
+        float d=0;
 	int i;
-	float dmax=0.6;
+	float dmax=0.4;
         float total=0;
 
 	float xcorrection=0;
@@ -39,32 +39,32 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 	int nocal=0;
 	geometry_msgs::PointStamped pointnocal;
 	
-	_dat.y=-_dat.y;
-	_dat.z=-_dat.z; 
-
 	//Manually remove the offsets. I am translating the reference frame to that of the Leica. This should be 		done automatically in the future
 	//Multiply*100to compensate the factor. offset negative in xa nad positive in z. Dont understand why yet. 
         
-	float offsetx=2.95158810914; //multiply offset by 100
-        float offsety=0.6843064446;
-        float offsetz=-7.69678354263;
+	float offsetx=0.0330739207566; //multiply offset by 100.No,. dividir entre factor
+        float offsety=-0.0118980463594;
+        float offsetz=0.080519028008;
+	
+	_dat.x=_dat.x/factor-offsetx;
+	_dat.y=-_dat.y/factor-offsety;
+	_dat.z=-_dat.z/factor-offsetz; 
 
 	//Uncalibrated values
-	pointnocal.point.x=_dat.x/100-offsetx/100;
-	pointnocal.point.y=_dat.y/100+offsety/100;
-	pointnocal.point.z=_dat.z/100+offsetz/100;
+	pointnocal.point.x=_dat.x;
+	pointnocal.point.y=_dat.y;
+	pointnocal.point.z=_dat.z;
 	pointnocal.header.stamp=ros::Time::now();
-	
-
-        //ROS_ERROR("%d",calibrationcomplete);
+	        
    if(calibrationcomplete==1)
    {
-	float p1 = 1;
-	for(i=0;i<100;i++)
+      for(i=0;i<14;i++)
         {
-	  d=sqrt(pow(dat.x-pointError[i].point.x,2)+pow(dat.y-pointError[i].point.y,2)+pow(dat.z-pointError[i].point.z,2));
+	  d=sqrt(pow(_dat.x-pointError[i].point.x,2)+pow(_dat.y/factor-pointError[i].point.y,2)+pow(_dat.z/factor-pointError[i].point.z,2));
 	  
-         //ROS_ERROR("distance=%f",d);
+	//ROS_ERROR("X=%f, Y=%f, Z=%f",_dat.x,_dat.y,_dat.z);
+	//ROS_ERROR("Xcal=%f, Ycal=%f, Zcal=%f",pointError[i].point.x,pointError[i].point.y,dat.z-pointError[i].point.z);  
+	//ROS_ERROR("distance=%f",d);
 	  
 	if(d<dmax){
           r[i]=exp(-d);
@@ -77,47 +77,38 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
         //ROS_ERROR("r[%d] %f",i,r[i]);
 	}
         
-	for(i=0;i<100;i++)
+	for(i=0;i<14;i++)
         {
           total+=r[i];
         }
-        for(i=0;i<100;i++)
-        {
-          w[i]=r[i]/total;
-	  //ROS_ERROR("W[%d]=%f",i,w[i]);
-        }
-  
-	for(i=0;i<100;i++)
-        {
-          xcorrection+=w[i]*pointError[i].error.x;
-          ycorrection+=w[i]*pointError[i].error.y;
-          zcorrection+=w[i]*pointError[i].error.z;
-        }
-        //ROS_ERROR("UnCalibrated x:%f y:%f z:%f ",(_dat.x - offsetx)/100,(_dat.y+offsety)/100,(_dat.z+offsetz)/100);
-	        
-        if(d<0.001||d>5||total<=0.00001)
-	{ 
-	  dat = _dat;
-	  dat.x = (_dat.x - offsetx)/factor;
-	  dat.y = (_dat.y + offsety)/factor;
-	  dat.z = (_dat.z + offsetz)/factor;
-	  ROS_ERROR("NANS!");	  
-	  nocal=1;
-	  //ROS_ERROR("NOCAL=%d",nocal);
-	}
-	 
-	  
-        if(nocal==0){
-	  
-	
-	dat = _dat;
-	dat.x = (_dat.x - offsetx)/factor;
-	dat.y = (_dat.y + offsety)/factor;
-	dat.z = (_dat.z + offsetz)/factor;
-	ROS_ERROR("COORECTIONX= %f, corerctiony= %f, correctionz= %f", xcorrection, ycorrection, zcorrection);
-
-	//ROS_ERROR("Calibrated x:%f y:%f z:%f ",dat.x,dat.y,dat.z);
         
+        if(total!=0){
+           for(i=0;i<14;i++)
+           {
+             w[i]=r[i]/total;	    
+           }
+           for(i=0;i<14;i++)
+           {
+            xcorrection+=w[i]*pointError[i].error.x;
+            ycorrection+=w[i]*pointError[i].error.y;
+            zcorrection+=w[i]*pointError[i].error.z;
+           }
+           dat = _dat;
+	   dat.x = _dat.x  + xcorrection;
+	   dat.y = _dat.y  + ycorrection;
+	   dat.z = _dat.z  + zcorrection;
+	   ROS_ERROR("UnCalibrated x:%f y:%f z:%f ",_dat.x ,_dat.y ,_dat.z ); 
+	   ROS_ERROR("Calibrated x:%f y:%f z:%f ",dat.x ,dat.y ,dat.z );
+	}
+	
+	if(total==0){
+	  
+	  dat = _dat;
+	  dat.x = _dat.x;
+	  dat.y = _dat.y;
+	  dat.z = _dat.z;
+	  ROS_ERROR("NANS!");	  	  
+	  //ROS_ERROR("NOCAL=%d",nocal);
 	}
             
    }     
@@ -125,9 +116,9 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
    {
     	//No calibration
 	dat = _dat;
-	dat.x = (_dat.x - offsetx)/factor;
-	dat.y = (_dat.y + offsety)/factor;
-	dat.z = (_dat.z + offsetz)/factor;
+	dat.x = _dat.x ;
+	dat.y = _dat.y ;
+	dat.z = _dat.z ;
 	
         //ROS_ERROR("NOCALIBRATION");
    }
