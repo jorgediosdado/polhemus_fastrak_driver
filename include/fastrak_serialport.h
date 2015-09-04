@@ -19,11 +19,11 @@ based on the work by: Eohan George, Pushkar Kolhe
 #include <math.h>  
 #include "geometry_msgs/PointStamped.h"
 
-// the max number of receivers
+
 #define MAX_NUM_RECEIVERS 4
 // the max characters to pass to check for correct data consistency
 #define MAX_TRIES_CORRECT_CBUFFER 3
-// max size of circ buffer - I think this is the max the serial can output too
+// max size of circ buffer
 #define CIRC_BUFFER_SIZE 500
 namespace polhemus
 {
@@ -55,7 +55,7 @@ namespace polhemus
 		int calibrationcomplete=0;
 
 		std::vector <StationData> sensTransform;
-		// the serial port structure from termios
+	
 		struct termios tio;
 		int tty_fd;
 		std::string deviceName;

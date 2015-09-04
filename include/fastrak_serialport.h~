@@ -25,7 +25,7 @@ based on the work by: Eohan George, Pushkar Kolhe
 #define MAX_TRIES_CORRECT_CBUFFER 3
 // max size of circ buffer - I think this is the max the serial can output too
 #define CIRC_BUFFER_SIZE 500
-namespace polyhemus
+namespace polhemus
 {
 	typedef std::pair<int,tf::Transform > StationData;
 #pragma pack(1)
@@ -55,7 +55,7 @@ namespace polyhemus
 		int calibrationcomplete=0;
 
 		std::vector <StationData> sensTransform;
-		// the serial port structure from termios
+	
 		struct termios tio;
 		int tty_fd;
 		std::string deviceName;
