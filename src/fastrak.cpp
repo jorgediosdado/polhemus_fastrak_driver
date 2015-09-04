@@ -2,19 +2,18 @@
 #include "fastrak_serialport.h"
 
 
-using namespace polyhemus;
+using namespace polhemus;
 
 
 Fastrak::Fastrak(const char *_deviceName, ros::NodeHandle& n)
 {
 	leftOver = 0;
-	deviceName =_deviceName;// ="/dev/ttyS0";
+	deviceName =_deviceName;
 	cb.set_capacity(CIRC_BUFFER_SIZE);
 	nocalpublisher = n.advertise<geometry_msgs::PointStamped>("nocalibrated", 1000);
 }
 
 Fastrak::~Fastrak() {}
-
 
 
 void Fastrak::setDistanceDivisionFactor(float factor_)
@@ -39,13 +38,13 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 	int nocal=0;
 	geometry_msgs::PointStamped pointnocal;
 	
-	//Manually remove the offsets. I am translating the reference frame to that of the Leica. This should be 		done automatically in the future
-	//Multiply*100to compensate the factor. offset negative in xa nad positive in z. Dont understand why yet. 
-        
-	float offsetx=0.0330739207566; //multiply offset by 100.No,. dividir entre factor
+	//Manually remove the offsets. I am translating the reference frame to that of the Leica. This should be 		done automatically in the future. It can be obtainid from the calibration node, since it does it already.
+
+        float offsetx=0.0330739207566; 
         float offsety=-0.0118980463594;
         float offsetz=0.080519028008;
 	
+	//Attention. Axis are not as printed in transmitter
 	_dat.x=_dat.x/factor-offsetx;
 	_dat.y=-_dat.y/factor-offsety;
 	_dat.z=-_dat.z/factor-offsetz; 
@@ -134,19 +133,18 @@ bool Fastrak::init()
 	memset(&tio,0,sizeof(tio));
 	tio.c_iflag=0;
 	tio.c_oflag=0;
-	tio.c_cflag=CS8|CREAD|CLOCAL; // set as per FASTRAK manual
+	tio.c_cflag=CS8|CREAD|CLOCAL; 
 	tio.c_lflag=0;
 	tio.c_cc[VMIN]=47;
 	tio.c_cc[VTIME]=5;
 	
-	//ROS_ERROR("PUERTO %s", deviceName);
+	
 	
 	tty_fd=open(deviceName.c_str(), O_RDWR | O_NONBLOCK);
 	if(tty_fd == -1 ) 
 	{
-		std::string er ("Device:"+deviceName +" could be opened");
-		ROS_ERROR(er.c_str() ) ;
-		ROS_ERROR("Device could not be opened");
+		std::string er ("Device:"+deviceName +" could not be opened");
+		ROS_ERROR(er.c_str() ) ;		
 		return false;
 	}
 	cfsetospeed(&tio,B115200); // Baud rate = 115200 
@@ -218,11 +216,10 @@ void Fastrak::populateTf(Data &_dat, std::vector<StationData> & vecTransform)
 	StationData stData;			
 	stData.first = dat.station_num-48; 	// obtain the ASCII value 
 	
-	Eigen::Vector3d euler;
-	//Broadcast transform
+	Eigen::Vector3d euler;	
 
-	tf::Transform tf; //tf is a transform object
-	//tf.setOrigin( tf::Vector3(dat.x/factor,dat.y/factor,dat.z/factor) ); removing the factorization to 											calibration
+	tf::Transform tf;
+	
 	tf.setOrigin( tf::Vector3(dat.x,dat.y,dat.z) ); //setOrigin Returns the origin vector translation
 
 
@@ -325,7 +322,7 @@ void Fastrak::getSensPosition ()
 
 Eigen::Vector3d Fastrak::quaternionToEulerAnglesZYX(Eigen::Quaterniond q)
  {
-   // Implementation from RPG quad_tutorial
+   //Implementation from RPG quad_tutorial
    Eigen::Vector3d euler_angles;
    euler_angles(0) = atan2(2*q.w()*q.x() + 2*q.y()*q.z(), q.w()*q.w() - q.x()*q.x() - q.y()*q.y() + q.z()*q.z());
    euler_angles(1) = -asin(2*q.x()*q.z() - 2*q.w()*q.y());

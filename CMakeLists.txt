@@ -40,14 +40,14 @@ include_directories(
   ${EIGEN_INCLUDE_DIRS}	
 )
 
-add_executable(fastrak_allSensorRead 
-  src/allSensorRead.cpp 
+add_executable(fastrak_driver 
+  src/main.cpp 
   src/fastrak.cpp
 
   
   )
 
-target_link_libraries(fastrak_allSensorRead
+target_link_libraries(fastrak_driver
   ${catkin_LIBRARIES}
   )
 

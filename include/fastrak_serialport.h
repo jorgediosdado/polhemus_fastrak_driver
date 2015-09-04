@@ -1,9 +1,8 @@
 /*
-Author: Eohan George, Pushkar Kolhe 
-Nov 17, 2010
+Author: Jorge Diosdado
 
-Revised by: Jorge Diosdado
-February 2015
+based on the work by: Eohan George, Pushkar Kolhe
+
 */
 
 #ifndef FASTRAK_SERIALPORT_H
@@ -26,7 +25,7 @@ February 2015
 #define MAX_TRIES_CORRECT_CBUFFER 3
 // max size of circ buffer - I think this is the max the serial can output too
 #define CIRC_BUFFER_SIZE 500
-namespace polyhemus
+namespace polhemus
 {
 	typedef std::pair<int,tf::Transform > StationData;
 #pragma pack(1)

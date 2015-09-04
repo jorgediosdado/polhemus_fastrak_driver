@@ -1,7 +1,7 @@
 <launch>
-  <node pkg="fastrak_mocap_driver" type="fastrak_allSensorRead" name="testfastrak_one_sensor">
-  	<param name="serial"  value="/dev/ttyS0"/>
-	<param name="base_frame"  value="/polhemus_base_frame"/>
-	<param name="current_frame"  value="/polhemus_current_frame"/>
+  <node pkg="polhemus_fastrak_driver" type="fastrak_driver" name="fastrak">
+  	<param name="serial"  value="/dev/ttyUSB0"/>
+	<param name="base_frame" type="string" value="/polhemus_transmitter_frame"/>
+	<param name="current_sensor" type="string" value="/polhemus_receiver_frame"/>
   </node>
 </launch>

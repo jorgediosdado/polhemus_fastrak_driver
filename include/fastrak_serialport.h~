@@ -1,9 +1,8 @@
 /*
-Author: Eohan George, Pushkar Kolhe 
-Nov 17, 2010
+Author: Jorge Diosdado
 
-Revised by: Jorge Diosdado
-February 2015
+based on the work by: Eohan George, Pushkar Kolhe
+
 */
 
 #ifndef FASTRAK_SERIALPORT_H
@@ -18,6 +17,7 @@ February 2015
 #include <Eigen/Dense>
 #include "calibration/pointError.h"
 #include <math.h>  
+#include "geometry_msgs/PointStamped.h"
 
 // the max number of receivers
 #define MAX_NUM_RECEIVERS 4
