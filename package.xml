@@ -7,6 +7,9 @@
   <maintainer email="diosdado100591@hotmail.com"></maintainer>
 
   <author>Jorge Diosdado</author>
+  <author>Pushkar Kolhe</author>
+  <author>Eohan George</author>
+
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>

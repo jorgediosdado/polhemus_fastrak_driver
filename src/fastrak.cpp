@@ -1,3 +1,11 @@
+/*
+CSIRO copyright.
+
+Author: Jorge Diosdado. 
+
+based on the work by: Pushkar Kolhe, Eohan George
+
+*/
 
 #include "fastrak_serialport.h"
 
@@ -38,7 +46,7 @@ void Fastrak::calibrateSensorValue(Data &_dat, Data &dat)
 	int nocal=0;
 	geometry_msgs::PointStamped pointnocal;
 	
-	//Manually remove the offsets. I am translating the reference frame to that of the Leica. This should be 		done automatically in the future. It can be obtainid from the calibration node, since it does it already.
+	//Manually remove the offsets. I am translating the reference frame to that of the Leica. This should be 		done automatically in the future. It can be obtained from the calibration node, since it does it already.
 
         float offsetx=0.0330739207566; 
         float offsety=-0.0118980463594;

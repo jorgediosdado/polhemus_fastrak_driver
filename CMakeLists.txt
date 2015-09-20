@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   leica_ts12
   std_msgs
   geometry_msgs
+  calibration
 )
 
 find_package(Eigen REQUIRED) 

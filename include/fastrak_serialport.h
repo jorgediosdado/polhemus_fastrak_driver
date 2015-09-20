@@ -1,7 +1,9 @@
 /*
-Author: Jorge Diosdado
+CSIRO copyright.
 
-based on the work by: Eohan George, Pushkar Kolhe
+Author: Jorge Diosdado. 
+
+based on the work by: Pushkar Kolhe, Eohan George
 
 */
 
