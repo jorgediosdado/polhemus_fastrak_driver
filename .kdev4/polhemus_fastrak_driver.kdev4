@@ -1,0 +1,21 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00.\x00p\x00o\x00l\x00h\x00e\x00m\x00u\x00s\x00_\x00f\x00a\x00s\x00t\x00r\x00a\x00k\x00_\x00d\x00r\x00i\x00v\x00e\x00r)
+
+[CMake]
+Build Directory Count=1
+Current Build Directory Index=0
+ProjectRootRelative=./
+
+[CMake][CMake Build Directory 0]
+Build Directory Path=file:///home/jorge/catkin_ws/build/polhemus_fastrak_driver/catkin_generated/build
+Build Type=Debug
+CMake Binary=file:///usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=file:///usr/local
+
+[Launch]
+Launch Configurations=
+
+[Project]
+VersionControlSupport=kdevgit
